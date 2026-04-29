@@ -7,7 +7,6 @@ interface SessionSummaryDto {
   id: string;
   createdAt: string;
   role: string;
-  intent: string;
   fileCount: number;
   questionCount: number;
   messageCount: number;

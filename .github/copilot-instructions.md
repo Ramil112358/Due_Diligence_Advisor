@@ -17,3 +17,5 @@ Generation completion note: avoid status-only checks like `status !== "done"` fo
 Session layout note: keep Data Room and Due Diligence Q&A in separate sidebars around chat and preserve symmetric collapse/expand controls on both sides so users can reclaim workspace width without losing quick access to either panel.
 
 Generation throughput note: for `GET /api/sessions/{id}/generate`, prefer bounded concurrency (`asyncio.gather` + `asyncio.Semaphore`) for both file summaries and DD Q&A so LLM calls run in parallel without overwhelming provider limits; keep per-item DB writes and SSE item events intact.
+
+File summary status note: track file summaries with an explicit `files.status` (`pending`/`done`/`error`) and drive frontend loading from that status rather than `summary == null`, so LLM/provider failures (for example quota 429) resolve to visible `error` instead of infinite spinners.

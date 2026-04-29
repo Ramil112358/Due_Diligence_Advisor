@@ -39,8 +39,6 @@ export default function AnswerText({
           </button>
         )
       )}
-      {/* citations available via prop for downstream use; intentionally not rendered as raw chips here */}
-      {citations.length > 0 ? null : null}
     </div>
   );
 }

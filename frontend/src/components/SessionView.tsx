@@ -15,6 +15,7 @@ export interface SessionFile {
   pageCount: number | null;
   summary: string | null;
   tags: string[];
+  status: string;
 }
 
 export interface SessionQuestion {
@@ -63,7 +64,7 @@ export default function SessionView({ initial }: { initial: InitialSession }) {
 
   const needsGen = useMemo(
     () =>
-      files.some((f) => !f.summary) ||
+      files.some((f) => f.status === "pending") ||
       questions.some((q) => q.status !== "done" && !q.answer),
     [files, questions]
   );
@@ -150,17 +151,31 @@ export default function SessionView({ initial }: { initial: InitialSession }) {
 
     if (event === "file_start") {
       setActiveFileId(parsed.fileId);
+      setFiles((prev) =>
+        prev.map((f) =>
+          f.id === parsed.fileId
+            ? { ...f, status: "pending" }
+            : f
+        )
+      );
     } else if (event === "file_done") {
       setActiveFileId(null);
       setFiles((prev) =>
         prev.map((f) =>
           f.id === parsed.fileId
-            ? { ...f, summary: parsed.summary, tags: parsed.tags }
+            ? { ...f, summary: parsed.summary, tags: parsed.tags, status: "done" }
             : f
         )
       );
     } else if (event === "file_error") {
       setActiveFileId(null);
+      setFiles((prev) =>
+        prev.map((f) =>
+          f.id === parsed.fileId
+            ? { ...f, status: "error" }
+            : f
+        )
+      );
     } else if (event === "question_start") {
       setActiveQuestionId(parsed.questionId);
     } else if (event === "question_done") {

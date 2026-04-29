@@ -49,3 +49,12 @@ def _ensure_schema_updates() -> None:
             conn.execute(
                 text("ALTER TABLE sessions ADD COLUMN client TEXT")
             )
+
+        file_columns = {column["name"] for column in inspector.get_columns("files")} if "files" in inspector.get_table_names() else set()
+        if file_columns and "status" not in file_columns:
+            conn.execute(
+                text("ALTER TABLE files ADD COLUMN status TEXT NOT NULL DEFAULT 'pending'")
+            )
+            conn.execute(
+                text("UPDATE files SET status = 'done' WHERE summary IS NOT NULL AND TRIM(summary) != ''")
+            )

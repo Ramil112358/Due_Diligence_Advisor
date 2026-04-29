@@ -1,7 +1,7 @@
 import re
 from io import BytesIO
 from pathlib import Path
-from typing import Iterable, List, Optional
+from typing import Optional
 
 from pypdf import PdfReader
 

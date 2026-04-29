@@ -53,6 +53,7 @@ class File(Base):
     page_count = Column(Integer, nullable=True)
     summary = Column(Text, nullable=True)
     tags = Column(Text, nullable=True)  # JSON array
+    status = Column(String, nullable=False, default="pending")
 
     session = relationship("Session", back_populates="files")
 

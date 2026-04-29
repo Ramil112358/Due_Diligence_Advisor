@@ -50,6 +50,7 @@ def _session_to_detail(s: models.Session) -> SessionDetail:
                 pageCount=f.page_count,
                 summary=f.summary,
                 tags=_safe_tags(f.tags),
+                status=f.status,
             )
             for f in sorted(s.files, key=lambda x: x.name)
         ],
@@ -171,6 +172,7 @@ async def create_session(
                 mime_type=mt,
                 bytes=len(data),
                 page_count=page_count,
+                status="pending",
             )
         )
     db.commit()

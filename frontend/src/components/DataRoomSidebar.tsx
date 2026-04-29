@@ -67,7 +67,8 @@ export default function DataRoomSidebar({
 function FileItem({ f, active }: { f: SessionFile; active: boolean }) {
   const [open, setOpen] = useState(false);
   const hasDetails = !!f.summary || f.tags.length > 0;
-  const isPending = !f.summary;
+  const isPending = f.status === "pending";
+  const isError = f.status === "error";
 
   return (
     <li className={`border rounded-2xl text-sm bg-white ${active ? "border-klarus-accent" : "border-klarus-line"}`}>
@@ -89,6 +90,8 @@ function FileItem({ f, active }: { f: SessionFile; active: boolean }) {
           <span className="text-xs text-klarus-muted shrink-0 mt-0.5 inline-flex items-center gap-1.5">
             <LoadingSpinner />
           </span>
+        ) : isError ? (
+          <span className="text-xs text-klarus-muted shrink-0 mt-0.5">error</span>
         ) : hasDetails && <span className="text-xs text-klarus-muted shrink-0 mt-0.5">{open ? "−" : "+"}</span>}
       </button>
       {open && (

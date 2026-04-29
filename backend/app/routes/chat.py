@@ -10,7 +10,7 @@ from ..citations import citations_to_json
 from ..db import db_session
 from ..file_processing import load_bytes
 from ..gemini_provider import DocumentPart, chat_stream
-from ..schemas import ChatRequest, CitationOut
+from ..schemas import ChatRequest
 from ..session_access import get_active_session
 from ..system_prompts import chat_system_prompt
 

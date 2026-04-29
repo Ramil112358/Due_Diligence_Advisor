@@ -32,6 +32,7 @@ def _load_session(session_id: str):
                 "path": f.path,
                 "mime_type": f.mime_type,
                 "summary": f.summary,
+                "status": f.status,
             }
             for f in s.files
         ]
@@ -65,6 +66,7 @@ async def generate(session_id: str):
                     if row:
                         row.summary = result["summary"]
                         row.tags = json.dumps(result["tags"])
+                        row.status = "done"
                         db.commit()
                 return (
                     "file_done",
@@ -120,7 +122,7 @@ async def generate(session_id: str):
                 return e
 
         # 1) per-file summary pass for files without one
-        files_to_summarize = [f for f in s["files"] if not f["summary"]]
+        files_to_summarize = [f for f in s["files"] if f["status"] == "pending"]
         summary_sem = asyncio.Semaphore(SUMMARY_CONCURRENCY)
         summary_jobs = []
         for f in files_to_summarize:
@@ -134,6 +136,11 @@ async def generate(session_id: str):
             for idx, result in enumerate(summary_results):
                 file_row = files_to_summarize[idx]
                 if isinstance(result, Exception):
+                    with db_session() as db:
+                        row = db.get(models.File, file_row["id"])
+                        if row:
+                            row.status = "error"
+                            db.commit()
                     yield {
                         "event": "file_error",
                         "data": json.dumps({"fileId": file_row["id"], "message": str(result)}),
