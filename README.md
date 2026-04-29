@@ -128,8 +128,7 @@ npm run dev                       # http://localhost:3000
 - **Non-image file types.** Right now uploads of `.docx`, `.pptx`, `.xlsx`, `.html`, `.csv`, `.txt`, or `.md` are rejected at the intake page. Adding format-specific parsers (`mammoth`/`python-docx`, `python-pptx`, `openpyxl`, `beautifulsoup4`) feeding into the text-extraction pipeline above is the next big extension.
 - **Large-PDF handling.** PDFs above Gemini's per-request inline limit need either chunked vision passes or the Gemini File API upload-then-reference pattern. Out of scope here because the simulated data room is small.
 - **PDF.js inline viewer with highlighted regions.** The citation drawer currently embeds the source PDF via `<iframe ... #page=N>`, which jumps to the right page in modern browsers but doesn't highlight the cited span. PDF.js with text-layer highlighting is the next step.
-- **Customised DD question set.** Today the ten DD questions are fixed. A short LLM call at session start could prune the template to what the data room actually contains and add 1–3 questions tailored to the user's stated intent.
-- **Cross-document inconsistency UI.** Today inconsistencies surface inside the "Risk — gaps" answer as prose. A dedicated diff-style panel listing each disagreement would scan faster.
-- **Auth + audit trail.** Allow for multi-user with Authentication instead of single local user
+- **Customised DD question set.** Today the ten DD questions are fixed. A short LLM call at session start could prune the template to what the data room actually contains and add 1–3 tailored questions.
+- **Auth + audit trail.** Allow for multi-user access with Authentication instead of single local user
 - **Background workers for `/generate`.** Today the SSE handler executes the LLM calls inline. For a multi-user deployment, push the work onto a Celery worker and let the SSE endpoint just stream task progress.
 - **Dockerfile + docker-compose** so backend + frontend come up with one command.
