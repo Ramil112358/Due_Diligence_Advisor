@@ -86,7 +86,7 @@ npm run dev                       # http://localhost:3000
 | GET    | `/api/sessions/{id}`                | Full session restore (files + Q&A + messages)                           |
 | DELETE | `/api/sessions/{id}`                | Soft-delete a session by setting `deleted = true`                       |
 | GET    | `/api/sessions/{id}/generate`       | SSE: bounded-parallel per-file summaries (Flash) → bounded-parallel DD Q&A pre-gen (Pro) |
-| POST   | `/api/sessions/{id}/chat`           | SSE: streaming agent loop with `list_files` + `get_file_content` tools, OR `googleSearch` grounding when web search is on |
+| POST   | `/api/sessions/{id}/chat`           | SSE: streaming agent loop with `list_files` + `get_file_content` tools; when web search is on, `googleSearch` is added to the same request |
 | GET    | `/api/files/{id}/raw`               | Raw PDF/image bytes for the citation drawer                             |
 
 ### Key backend decisions
@@ -94,7 +94,7 @@ npm run dev                       # http://localhost:3000
 1. **Vision-native ingestion, no server-side text extraction.** Every PDF and image is sent to Gemini as `Part.from_bytes(...)`. The model handles layout, tables, and the bar charts in `05_Meridian_Management_Presentation_Excerpt.pdf`.
 2. **Citations as an output contract.** System prompts force every claim to end with `[file_name p.X]` markers. A regex parser (`citations.py`) turns those markers into structured `Citation` rows. Same parser runs server-side and the same shape is rendered as clickable chips on the client.
 3. **Hardcoded DD checklist** in `dd_questions.py` — predictable, auditable. Customising from intent is future work.
-4. **Mode-switched chat agent loop.** Function tools (`list_files`, `get_file_content`) when web search is off; `googleSearch` grounding when on. Gemini does not allow combining the two in one call.
+4. **Unified chat agent loop.** Both modes use the same function tools (`list_files`, `get_file_content`) for lazy on-demand file loading. When web search is on, `googleSearch` is added to the same tool list alongside the function tools — Gemini supports combining both in one request.
 5. **SSE for both generation and chat.** `sse-starlette`'s `EventSourceResponse` streams events.
     The frontend generation view adds a 1-second state poll fallback while pending items exist, so summaries/Q&A keep updating without manual refresh if a stream disconnect occurs.
     On the backend, `/generate` now executes file summaries and DD Q&A using `asyncio.gather(...)` with semaphores to keep concurrency bounded (currently `5` for each phase) instead of running every LLM call strictly one-by-one.

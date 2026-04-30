@@ -57,13 +57,6 @@ async def post_chat(session_id: str, req: ChatRequest):
         gtypes.Content(role="user", parts=[gtypes.Part.from_text(text=text)])
     )
 
-    initial_documents: List[DocumentPart] = []
-    if ctx["web_search_enabled"]:
-        for f in files:
-            initial_documents.append(
-                DocumentPart(name=f["name"], mime_type=f["mime_type"], data=load_bytes(f["path"]))
-            )
-
     files_by_name = {f["name"]: f for f in files}
 
     async def list_files_handler():
@@ -95,7 +88,7 @@ async def post_chat(session_id: str, req: ChatRequest):
             async for ev in chat_stream(
                 system_instruction=sys_prompt,
                 history=history,
-                initial_documents=initial_documents,
+                initial_documents=[],
                 tool_handlers={
                     "list_files": list_files_handler,
                     "get_file_content": get_file_content_handler,
